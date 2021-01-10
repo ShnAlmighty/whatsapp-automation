@@ -23,37 +23,6 @@ def connect():
     Body TEXT NOT NULL,
     Time TEXT NOT NULL)""")
 
-# def clearLog():
-#     cursor = conn.execute("SELECT Name,Time,Body FROM log")
-#     while(cursor):
-#         cursor = conn.execute("SELECT Name,Time,Body FROM log")
-#         for row in cursor:
-#             contact = row[0]
-#             text = row[2]
-#             currentTimeTemp = datetime.datetime.now().strftime("%H:%M:%S")
-#             currentTime =  datetime.datetime.strptime(currentTimeTemp,"%H:%M:%S")
-#             tempDate = datetime.datetime.strptime(row[1],"%H:%M:%S")
-#             if(tempDate < currentTime):
-#                 alarm = datetime.datetime.now().strftime("%H:%M:%S")
-#                 inp_xpath_search = "//*[@id='side']/div[1]/div/label/div/div[2]"
-#                 input_box_search = WebDriverWait(driver,50).until(lambda driver: driver.find_element_by_xpath(inp_xpath_search))
-#                 input_box_search.click()
-#                 time.sleep(1)
-#                 input_box_search.send_keys(contact)
-#                 time.sleep(1)
-#                 selected_contact = driver.find_element_by_xpath("//span[@title='"+contact+"']")
-#                 time.sleep(1)
-#                 selected_contact.click() 
-#                 oldText = WebDriverWait(driver,50).until(lambda driver:driver.find_element_by_xpath("""//*[@id="main"]/div[3]/div/div/div[3]"""))
-#                 time.sleep(1)
-#                 inp_xpath = '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]'
-#                 input_box = WebDriverWait(driver,50).until(lambda driver:driver.find_element_by_xpath(inp_xpath))
-#                 time.sleep(1)
-#                 input_box.send_keys(text + Keys.ENTER)
-#                 messagebox.showinfo('showinfo','Message sent to {} at {}'.format(contact,alarm))
-#                 conn.execute("DELETE FROM log WHERE NAME = {}".format(contact))
-#                 conn.commit()
-
 def send():
     global ans,conn,recievers
     if(recievers):
@@ -84,8 +53,6 @@ def send():
                     """%(contact,text,alarm))
                     conn.commit()
                     messagebox.showinfo('showinfo','Message is stored and will be sent')
-                    # clearLog()
-                    # os.startfile("runLog.py")
                     # setTime = datetime.datetime.now().strftime("%H:%M:%S")
                     # while(setTime != alarm):
                     #     setTime = datetime.datetime.now().strftime("%H:%M:%S")
@@ -102,33 +69,8 @@ def send():
                 INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
                 """%(contact,text,timeE1))
                 conn.commit()
-                messagebox.showinfo('showinfo','Message is stored and will be sent')
-            # conn.execute("""
-            #     INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-            #     """%(contact,text,timeE1))
-            # conn.commit()
+            
             messagebox.showinfo('showinfo','Message is stored and will be sent')
-            # os.startfile("runLog.py")
-            # alarm=datetime.datetime.now().strftime("%H %M %S")
-            # inp_xpath_search = "//*[@id='side']/div[1]/div/label/div/div[2]"
-            # input_box_search = WebDriverWait(driver,50).until(lambda driver: driver.find_element_by_xpath(inp_xpath_search))
-            # input_box_search.click()
-            # time.sleep(1)
-            # input_box_search.send_keys(contact)
-            # time.sleep(1)
-            # selected_contact = driver.find_element_by_xpath("//span[@title='"+contact+"']")
-            # time.sleep(1)
-            # selected_contact.click() 
-            # oldText = WebDriverWait(driver,50).until(lambda driver:driver.find_element_by_xpath("""//*[@id="main"]/div[3]/div/div/div[3]"""))
-            # #messagebox.showinfo('showinfo',oldText.text)
-            # time.sleep(1)
-            # inp_xpath = '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]'
-            # input_box = WebDriverWait(driver,50).until(lambda driver:driver.find_element_by_xpath(inp_xpath))
-            # time.sleep(1)
-            # input_box.send_keys(text + Keys.ENTER)
-            # messagebox.showinfo('showinfo','Message sent to {} at {}'.format(contact,alarm))
-            # readText = driver.find_element_by_xpath("""//*[@id="main"]/div[3]/div/div/div[3]""")
-
 
 def showTimer():
     global hl,timeE,TimerButton
