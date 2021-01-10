@@ -24,53 +24,54 @@ def connect():
     Time TEXT NOT NULL)""")
 
 def send():
-    global ans,conn,recievers
+    global ans,conn,recievers,inp1,inp2,timeE,frame1
+    
     if(recievers):
         size = len(recievers)
     else:
         size=0
-    ans = "yes"
-    if(ans == "yes"):
-        global inp1,inp2,timeE,frame1,driver
-        if(size==0):
-            contact =  str(inp1.get()) 
-        else:
-            contact=list(recievers)
-            recievers = []
-        text = str(inp2.get("1.0","end-1c"))
-        if(timeE != None):
-            alarm =  str(timeE.get())  
-            if(alarm!="" or timeE == None):
-                if(size>1):
-                    for i in range(size):
-                        conn.execute("""
-                        INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                        """%(contact[i],text,alarm))
-                        conn.commit()      
-                else:
-                    conn.execute("""
-                    INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                    """%(contact,text,alarm))
-                    conn.commit()
-                    messagebox.showinfo('showinfo','Message is stored and will be sent')
-                    # setTime = datetime.datetime.now().strftime("%H:%M:%S")
-                    # while(setTime != alarm):
-                    #     setTime = datetime.datetime.now().strftime("%H:%M:%S")
-        else: 
-            timeE1 = datetime.datetime.now().strftime("%H:%M:%S")
+
+    if(size==0):
+        contact =  str(inp1.get()) 
+    else:
+        contact=list(recievers)
+        recievers = []
+
+    text = str(inp2.get("1.0","end-1c"))
+
+    if(timeE != None):
+        alarm =  str(timeE.get())  
+        if(alarm!="" or timeE == None):
             if(size>1):
                 for i in range(size):
                     conn.execute("""
                     INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                    """%(contact[i],text,timeE1))
-                    conn.commit()     
+                    """%(contact[i],text,alarm))
+                    conn.commit()      
             else:
                 conn.execute("""
                 INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                """%(contact,text,timeE1))
+                """%(contact,text,alarm))
                 conn.commit()
-            
-            messagebox.showinfo('showinfo','Message is stored and will be sent')
+                messagebox.showinfo('showinfo','Message is stored and will be sent')
+                # setTime = datetime.datetime.now().strftime("%H:%M:%S")
+                # while(setTime != alarm):
+                #     setTime = datetime.datetime.now().strftime("%H:%M:%S")
+    else: 
+        timeE1 = datetime.datetime.now().strftime("%H:%M:%S")
+        if(size>1):
+            for i in range(size):
+                conn.execute("""
+                INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
+                """%(contact[i],text,timeE1))
+                conn.commit()     
+        else:
+            conn.execute("""
+            INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
+            """%(contact,text,timeE1))
+            conn.commit()
+        
+        messagebox.showinfo('showinfo','Message is stored and will be sent')
 
 def showTimer():
     global hl,timeE,TimerButton
@@ -81,6 +82,7 @@ def showTimer():
     timeE.grid(row=7,column=0,ipadx='60',ipady='3')
 
 def closeF():
+    global menu
     menu.destroy()
     # driver.close()
     global logBook
