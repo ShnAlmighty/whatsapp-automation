@@ -1,18 +1,18 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
 import time
 import json
 import os
 import datetime
-from datetime import date
-from tkinter import Tk,Button,Label,Entry,Text,Frame,messagebox,ttk
-from PIL import ImageTk, Image
 import sqlite3 
 import subprocess
 import psutil
 import signal
 import sys
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from datetime import date
+from tkinter import Tk,Button,Label,Entry,Text,Frame,messagebox,ttk
+from PIL import ImageTk, Image
 
 def connect():
     global conn
