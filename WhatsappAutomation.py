@@ -11,7 +11,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from datetime import date
-from tkinter import Tk,Button,Label,Entry,Text,Frame,messagebox,ttk
+from tkinter import Tk,Button,Label,Entry,Text,Frame,messagebox,ttk,END
 from PIL import ImageTk, Image
 
 def connect():
@@ -24,7 +24,7 @@ def connect():
     Time TEXT NOT NULL)""")
 
 def send():
-    global ans,conn,recievers,inp1,inp2,timeE,frame1
+    global ans,conn,recievers,inp1,inp2,timeE,frame1,remiderE,hl,sl,reminderButton,TimerButton
     
     if(recievers):
         size = len(recievers)
@@ -41,7 +41,19 @@ def send():
 
     if(timeE != None):
         alarm =  str(timeE.get())  
-        if(alarm!="" or timeE == None):
+        if(alarm!=""):
+            if(remiderE != None):
+                dateTemp = remiderE.get()
+                remiderE.grid_remove()
+                reminderButton.grid()
+                remiderE=None
+            else:
+                dateTemp = datetime.datetime.now().strftime("%Y-%m-%d")
+            tempDate = alarm.split(" ")
+            if(len(tempDate)==2):
+                pass
+            else:
+                alarm = dateTemp +" "+ tempDate[0]
             if(size>1):
                 for i in range(size):
                     conn.execute("""
@@ -57,8 +69,11 @@ def send():
                 # setTime = datetime.datetime.now().strftime("%H:%M:%S")
                 # while(setTime != alarm):
                 #     setTime = datetime.datetime.now().strftime("%H:%M:%S")
+        timeE.grid_remove()
+        TimerButton.grid()
+        timeE = None
     else: 
-        timeE1 = datetime.datetime.now().strftime("%H:%M:%S")
+        timeE1 = datetime.datetime.now().strftime("%Y-%m-%d %X")
         if(size>1):
             for i in range(size):
                 conn.execute("""
@@ -70,16 +85,24 @@ def send():
             INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
             """%(contact,text,timeE1))
             conn.commit()
-        
-        messagebox.showinfo('showinfo','Message is stored and will be sent')
 
 def showTimer():
     global hl,timeE,TimerButton
     TimerButton.grid_remove()
-    hl = Label(frame1,text='Time at which you want to send (hh:mm:ss)')
-    hl.grid(row=6,column=0,pady=(10,0),ipadx='40')
     timeE = Entry(frame1,textvariable="")
-    timeE.grid(row=7,column=0,ipadx='60',ipady='3')
+    timeE.insert(0,'Time at which you want to send(hh:mm:ss)')
+    #timeE.bind("<FocusOut>",lambda args: timeE.insert(0,'Time at which you want to send(hh:mm:ss)'))
+    timeE.grid(row=4,column=0,ipadx='60',ipady='3',pady=(10,5))
+    timeE.bind("<FocusIn>",lambda args: timeE.delete(0,'end'))
+
+def showReminder():
+    global reminderButton,remiderE,sl
+    reminderButton.grid_remove()
+    remiderE = Entry(frame1,textvariable="")
+    remiderE.insert(0,'Date at which you want to send(YYYY:MM:DD)')
+    #remiderE.bind("<FocusOut>",lambda args: remiderE.insert(0,'Date at which you want to send(YYYY:MM:DD)'))
+    remiderE.bind("<FocusIn>",lambda args: remiderE.delete(0,'end'))
+    remiderE.grid(row=5,column=0,ipadx='60',ipady='3',pady=(5,10))
 
 def closeF():
     global menu
@@ -128,11 +151,12 @@ def main():
     global logBook,frame1
     logBook = subprocess.Popen(["runLog.py"],shell=True)
 
-    global menu,ans,inp1,inp2,timeE,TimerButton,frame1,plural
+    global menu,ans,inp1,inp2,timeE,TimerButton,frame1,plural,reminderButton,remiderE
     menu = Tk()
     frame1 = Frame(menu)
     frame1.grid()
     timeE=None
+    remiderE=None
 
     img = Image.open("whatsapp.png")
     img = img.resize((100,100),Image.ANTIALIAS)
@@ -141,29 +165,34 @@ def main():
     logo = Label(frame1,image=img)
     logo.grid(row=0,column=0)
 
-    l1 = Label(frame1,text='Name of person')
-    l1.grid(row=1,column=0,sticky='nesw',pady=(10,0))
     inp1 = Entry(frame1)
-    inp1.grid(row=2,column=0,ipadx='60',ipady='3',pady='10',padx='20')
+    inp1.insert(0,'Name of person')
+    inp1.bind("<FocusIn>",lambda args: inp1.delete(0,'end'))
+    #inp1.bind("<FocusOut>",lambda args: inp1.insert(0,'Name of person'))
+    inp1.grid(row=1,column=0,ipadx='60',ipady='3',pady='10',padx='20')
     plural = Button(frame1,text="  Add  ",command = lambda: add())
-    plural.grid(row=3,column=0,pady=10,ipadx='40')
+    plural.grid(row=2,column=0,pady=10,ipadx='40')
 
-    l2 = Label(frame1,text='Type your message')
-    l2.grid(row=4,column=0)
     inp2 = Text(frame1,height=15,width=30)
-    inp2.grid(row=5,column=0)
+    inp2.insert('1.0','Type your message')
+    inp2.bind("<FocusIn>",lambda args: inp2.delete('1.0',END))
+    #inp2.bind("<FocusOut>",lambda args: inp2.insert('1.0','Type your message'))
+    inp2.grid(row=3,column=0)
 
     TimerButton = Button(frame1,text='Add Timer',command = lambda: showTimer())
-    TimerButton.grid(row=6,column=0,pady=10,ipadx='40')
+    TimerButton.grid(row=4,column=0,pady=10,ipadx='40',padx=(1,1))
+
+    reminderButton = Button(frame1,text='Add Reminder',command = lambda: showReminder())
+    reminderButton.grid(row=5,column=0,pady=10,ipadx='40',padx=(1,1))
 
     seeLog = Button(frame1,text='  Log  ',command=lambda:Display())
-    seeLog.grid(row=8,column=0,pady=10,ipadx='40')
+    seeLog.grid(row=6,column=0,pady=10,ipadx='40')
 
     close = Button(frame1,text='Close',command=lambda:closeF())
-    close.grid(row=9,column=0,pady=10,ipadx='40')
+    close.grid(row=7,column=0,pady=10,ipadx='40')
 
     sub1 = Button(frame1,text=' Submit ',command=lambda:send())
-    sub1.grid(row=10,column=0,pady=10,ipadx='40')
+    sub1.grid(row=8,column=0,pady=10,ipadx='40')
 
     menu.mainloop()
 
