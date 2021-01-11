@@ -27,12 +27,12 @@ def main():
             contact = row[0]
             text = row[2]
             sentTime = row[1]
-            currentTimeTemp = datetime.datetime.now().strftime("%H:%M:%S")
-            currentTime =  datetime.datetime.strptime(currentTimeTemp,"%H:%M:%S")
-            tempDate = datetime.datetime.strptime(row[1],"%H:%M:%S")
+            currentTimeTemp = datetime.datetime.now().strftime("%Y-%m-%d %X")
+            currentTime =  datetime.datetime.strptime(currentTimeTemp,"%Y-%m-%d %X")
+            tempDate = datetime.datetime.strptime(sentTime,"%Y-%m-%d %X")
             # Times.append(tempDate)
             if(tempDate < currentTime):
-                alarm = datetime.datetime.now().strftime("%H:%M:%S")
+                alarm = datetime.datetime.now().strftime("%Y-%m-%d %X")
                 inp_xpath_search = "//*[@id='side']/div[1]/div/label/div/div[2]"
                 input_box_search = WebDriverWait(driver,50).until(lambda driver: driver.find_element_by_xpath(inp_xpath_search))
                 remove_value = input_box_search.text
@@ -65,11 +65,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
-    #/html/body/div[1]/div/div/div[3]/div/div[2]/div[1]/div/div/div[13]/div
-    time.sleep(1)
-    #/html/body/div[1]/div/div/div[3]/div/div[2]/div[1]/div/div/div[1]/div   
-    #/html/body/div[1]/div/div/div[3]/div/div[2]/div[1]/div/div/div[1]/div
-    #/html/body/div[1]/div/div/div[3]/div/div[2]/div[1]/div/div/div[8]/div
-    #/html/body/div[1]/div/div/div[3]/div/div[2]/div[1]/div/div/div[1]/div
-"""
