@@ -119,7 +119,7 @@ def Display():
         a=a+1
         i=i+1
     exit = Button(displayFrame,text='Back',command=lambda: back(frame1,displayFrame))
-    exit.grid(row=(i+1),column=0,pady=10,ipadx='40')
+    exit.grid(row=(i+1),column=0,pady=10,ipadx='40',padx=(5,5))
             
 
 def main():
