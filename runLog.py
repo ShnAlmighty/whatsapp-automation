@@ -9,7 +9,7 @@ import sys
 
 conn = sqlite3.connect('pendingMsgs')
 
-driver = webdriver.Chrome(r"Browsers\chromedriver.exe")
+driver = webdriver.Chrome(r"C:\Users\user\Desktop\Web_Automation\Browsers\chromedriver.exe")
 driver.get("https://web.whatsapp.com")
 
 def confirm():
