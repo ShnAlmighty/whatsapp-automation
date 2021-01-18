@@ -232,7 +232,7 @@ def main():
     
     global frame1,FIXED,fixedButton
     FIXED=0
-    #logBook = subprocess.Popen(["runLog.py"],shell=True)
+    logBook = subprocess.Popen(["runLog.py"],shell=True)
 
     global menu,inp1,inp2,timeE,TimerButton,frame1,plural,reminderButton,remiderE
     menu = Tk()
