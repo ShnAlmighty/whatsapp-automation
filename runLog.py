@@ -9,8 +9,11 @@ import sys
 
 conn = sqlite3.connect('pendingMsgs')
 
-driver = webdriver.Chrome(r"PATH_TO_CHROME_DRIVER.EXE")
+driver = webdriver.Chrome(r"PATH_TO_CHROME_DRIVER_EXE")
 driver.get("https://web.whatsapp.com")
+
+#C:\Documents and Settings\All Users\Start Menu\Programs\StartUp
+#run_script.cmd -> python C:\Users\L K PATNAIK\Desktop\shantanu\pyth\Web_Automation\runLog.py
 
 def confirm():
     global ans
@@ -20,10 +23,11 @@ def confirm():
 def main():
     # Times = []
     global driver
-    cursor = conn.execute("SELECT Name,Time,Body FROM log")
+    cursor = conn.execute("SELECT Name,Time,Body,fixed FROM log")
     while(cursor):
-        cursor = conn.execute("SELECT Name,Time,Body FROM log")
+        cursor = conn.execute("SELECT Name,Time,Body,fixed FROM log")
         for row in cursor:
+            FIXED = row[3]                
             contact = row[0]
             text = row[2]
             sentTime = row[1]
@@ -52,16 +56,22 @@ def main():
                 inp_xpath = '//*[@id="main"]/footer/div[1]/div[2]/div/div[2]'
                 input_box = WebDriverWait(driver,50).until(lambda driver:driver.find_element_by_xpath(inp_xpath))
                 time.sleep(1)
-                input_box.send_keys(text + Keys.ENTER)
+                input_box.send_keys(text + Keys.ENTER + Keys.ENTER)
+                input_box1 = WebDriverWait(driver,50).until(lambda driver:driver.find_element_by_xpath(inp_xpath))
+                time.sleep(1)
+                input_box1.send_keys(Keys.ENTER)
+                #time.sleep(2)
+                # input_box.send_keys(Keys.ENTER+)
                 # messagebox.showinfo('showinfo','Message sent to {} at {}'.format(contact,alarm))
-                conn.execute("""DELETE FROM log WHERE (Time = '%s' and Name = '%s' and Body = '%s')"""%(sentTime,contact,text))
-                conn.commit()
-                # readText = driver.find_element_by_xpath("""//*[@id="main"]/div[3]/div/div/div[3]""")
-                # else:
-                #     conn.execute("""DELETE FROM log WHERE (Time = '%s' and Name = '%s' and Body = '%s')"""%(sentTime,contact,text))
-                #     conn.commit()
-                #     messagebox.showerror('showerror','Invalid Name!!')
-
+                if(FIXED==0):
+                    conn.execute("""DELETE FROM log WHERE (Time = '%s' and Name = '%s' and Body = '%s')"""%(sentTime,contact,text))
+                    conn.commit()
+                    conn.execute("REINDEX log")
+                    conn.commit()
+                else:
+                    newTime = tempDate+datetime.timedelta(days=1)
+                    conn.execute("""UPDATE log SET Time='%s' WHERE (Time = '%s' and Name = '%s' and Body = '%s')"""%(newTime,sentTime,contact,text))
+                    conn.commit()
 
 if __name__ == "__main__":
     main()
