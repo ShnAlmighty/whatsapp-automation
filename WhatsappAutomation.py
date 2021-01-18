@@ -1,4 +1,5 @@
 import time
+import json
 import os
 import datetime
 import sqlite3 
@@ -23,7 +24,7 @@ def connect():
     Time TEXT NOT NULL)""")
 
 def send():
-    global ans,conn,recievers,inp1,inp2,timeE,frame1,remiderE,hl,sl,reminderButton,TimerButton
+    global ans,conn,recievers,inp1,inp2,timeE,frame1,remiderE,hl,sl,reminderButton,TimerButton,FIXED,fixedButton
     
     if(recievers):
         size = len(recievers)
@@ -56,13 +57,13 @@ def send():
             if(size>1):
                 for i in range(size):
                     conn.execute("""
-                    INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                    """%(contact[i],text,alarm))
+                    INSERT INTO log (Name,Body,Time,fixed) VALUES ('%s','%s','%s','%d')
+                    """%(contact[i],text,alarm,FIXED))
                     conn.commit()      
             else:
                 conn.execute("""
-                INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                """%(contact,text,alarm))
+                INSERT INTO log (Name,Body,Time,fixed) VALUES ('%s','%s','%s','%d')
+                """%(contact,text,alarm,FIXED))
                 conn.commit()
                 messagebox.showinfo('showinfo','Message is stored and will be sent')
                 # setTime = datetime.datetime.now().strftime("%H:%M:%S")
@@ -71,19 +72,23 @@ def send():
         timeE.grid_remove()
         TimerButton.grid()
         timeE = None
+        FIXED=0
+        fixedButton.config(text="Fix MSG")
     else: 
         timeE1 = datetime.datetime.now().strftime("%Y-%m-%d %X")
         if(size>1):
             for i in range(size):
                 conn.execute("""
-                INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-                """%(contact[i],text,timeE1))
+                INSERT INTO log (Name,Body,Time,fixed) VALUES ('%s','%s','%s','%d')
+                """%(contact[i],text,timeE1,FIXED))
                 conn.commit()     
         else:
             conn.execute("""
-            INSERT INTO log (Name,Body,Time) VALUES ('%s','%s','%s')
-            """%(contact,text,timeE1))
+            INSERT INTO log (Name,Body,Time,fixed) VALUES ('%s','%s','%s','%d')
+            """%(contact,text,timeE1,FIXED))
             conn.commit()
+        FIXED=0
+        fixedButton.config(text="Fix MSG")
 
 def showTimer():
     global hl,timeE,TimerButton
@@ -92,7 +97,7 @@ def showTimer():
     timeE.insert(0,'Time at which you want to send(hh:mm:ss)')
     #timeE.bind("<FocusOut>",lambda args: timeE.insert(0,'Time at which you want to send(hh:mm:ss)'))
     timeE.grid(row=4,column=0,ipadx='60',ipady='3',pady=(10,5))
-    timeE.bind("<FocusIn>",lambda args: timeE.delete(0,'end'))
+    #timeE.bind("<FocusIn>",lambda args: timeE.delete(0,'end'))
 
 def showReminder():
     global reminderButton,remiderE,sl
@@ -127,6 +132,19 @@ def back(a,b):
     b.grid_remove()
     a.grid()
 
+def clearLog(a,f):
+    y = messagebox.askyesno('askyesno','Do you want to delete this messages?')
+    if(y==True):
+        global conn
+        conn.execute("DELETE FROM log WHERE rowid = %d"%(a))
+        conn.commit()
+        conn.execute("REINDEX log")
+        conn.commit()
+        messagebox.showinfo('showinfo','Message Deleted')
+        f.grid_remove()
+        Display()
+
+
 def Display():
     global frame1
     frame1.grid_remove()
@@ -135,19 +153,30 @@ def Display():
     displayFrame.grid()
     i,a=0,0
     panel = []
+    delete = []
     for data in cursor:
         panel.append(Label(displayFrame,text=data)) 
         panel[a].grid(row=i,column=0)
+        delete.append(Button(displayFrame,text='Delete',command=lambda a=data[0]: clearLog(a,displayFrame)))
+        delete[a].grid(row=i,column=1,pady=10,ipadx='40',padx=(5,5))
         a=a+1
         i=i+1
     exit = Button(displayFrame,text='Back',command=lambda: back(frame1,displayFrame))
     exit.grid(row=(i+1),column=0,pady=10,ipadx='40',padx=(5,5))
-            
+
+def fixedmsg():
+    y= messagebox.askyesno('askyesno','Do you want to fix this message?')
+    if(y==True):
+        global FIXED,fixedButton
+        FIXED = 1
+        fixedButton.config(text="Fixed")
+        messagebox.showinfo('showinfo','Message is fixed. This message will be sent everyday at the given time. Go to log if you want to remove this message.')
 
 def main():
     connect()
     
-    global logBook,frame1
+    global logBook,frame1,FIXED,fixedButton
+    FIXED=0
     logBook = subprocess.Popen(["runLog.py"],shell=True)
 
     global menu,ans,inp1,inp2,timeE,TimerButton,frame1,plural,reminderButton,remiderE
@@ -184,14 +213,17 @@ def main():
     reminderButton = Button(frame1,text='Add Reminder',command = lambda: showReminder())
     reminderButton.grid(row=5,column=0,pady=10,ipadx='40',padx=(1,1))
 
+    fixedButton = Button(frame1,text='Fixed MSG',command = lambda: fixedmsg())
+    fixedButton.grid(row=6,column=0,pady=10,ipadx='40',padx=(1,1))
+
     seeLog = Button(frame1,text='  Log  ',command=lambda:Display())
-    seeLog.grid(row=6,column=0,pady=10,ipadx='40')
+    seeLog.grid(row=7,column=0,pady=10,ipadx='40')
 
     close = Button(frame1,text='Close',command=lambda:closeF())
-    close.grid(row=7,column=0,pady=10,ipadx='40')
+    close.grid(row=8,column=0,pady=10,ipadx='40')
 
     sub1 = Button(frame1,text=' Submit ',command=lambda:send())
-    sub1.grid(row=8,column=0,pady=10,ipadx='40')
+    sub1.grid(row=9,column=0,pady=10,ipadx='40')
 
     menu.mainloop()
 
