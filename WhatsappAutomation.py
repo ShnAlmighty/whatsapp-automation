@@ -90,22 +90,58 @@ def send():
         FIXED=0
         fixedButton.config(text="Fix MSG")
 
+def contentClean(a):
+    if a==1:
+        global inp1
+        if(inp1.get() == "Name of person"): 
+            inp1.delete(0,'end')
+    elif a==2:
+        global inp2
+        if(inp2.get("1.0","end-1c") == "Type your message"): 
+            inp2.delete('1.0','end')
+    elif a==3:
+        global timeE
+        if(timeE.get() == "Time at which you want to send(hh:mm:ss)"): 
+            timeE.delete(0,'end')
+    elif a==4:
+        global remiderE
+        if(remiderE.get() == "Date at which you want to send(YYYY:MM:DD)"): 
+           remiderE.delete(0,'end')
+
+def contentFill(a):
+    if a==1:
+        global inp1
+        if(inp1.get() == ""): 
+            inp1.insert(0,'Name of person')
+    elif a==2:
+        global inp2
+        if(inp2.get("1.0","end-1c") == ""): 
+            inp2.insert('1.0','Type your message')
+    elif a==3:
+        global timeE
+        if(timeE.get() == ""): 
+            timeE.insert(0,'Time at which you want to send(hh:mm:ss)')
+    elif a==4:
+        global remiderE
+        if(remiderE.get() == ""): 
+           remiderE.insert(0,'Date at which you want to send(YYYY-MM-DD)')
+        
 def showTimer():
     global hl,timeE,TimerButton
     TimerButton.grid_remove()
     timeE = Entry(frame1,textvariable="")
     timeE.insert(0,'Time at which you want to send(hh:mm:ss)')
-    #timeE.bind("<FocusOut>",lambda args: timeE.insert(0,'Time at which you want to send(hh:mm:ss)'))
+    timeE.bind("<FocusOut>",lambda args: contentFill(3))
     timeE.grid(row=4,column=0,ipadx='60',ipady='3',pady=(10,5))
-    #timeE.bind("<FocusIn>",lambda args: timeE.delete(0,'end'))
+    timeE.bind("<FocusIn>",lambda args: contentClean(3))
 
 def showReminder():
     global reminderButton,remiderE,sl
     reminderButton.grid_remove()
     remiderE = Entry(frame1,textvariable="")
     remiderE.insert(0,'Date at which you want to send(YYYY:MM:DD)')
-    #remiderE.bind("<FocusOut>",lambda args: remiderE.insert(0,'Date at which you want to send(YYYY:MM:DD)'))
-    remiderE.bind("<FocusIn>",lambda args: remiderE.delete(0,'end'))
+    remiderE.bind("<FocusOut>",lambda args: contentFill(4))
+    remiderE.bind("<FocusIn>",lambda args: contentClean(4))
     remiderE.grid(row=5,column=0,ipadx='60',ipady='3',pady=(5,10))
 
 def closeF():
@@ -143,7 +179,6 @@ def clearLog(a,f):
         messagebox.showinfo('showinfo','Message Deleted')
         f.grid_remove()
         Display()
-
 
 def Display():
     global frame1
@@ -195,35 +230,35 @@ def main():
 
     inp1 = Entry(frame1)
     inp1.insert(0,'Name of person')
-    inp1.bind("<FocusIn>",lambda args: inp1.delete(0,'end'))
-    #inp1.bind("<FocusOut>",lambda args: inp1.insert(0,'Name of person'))
+    inp1.bind("<FocusIn>",lambda args: contentClean(1))
+    inp1.bind("<FocusOut>",lambda args: contentFill(1))
     inp1.grid(row=1,column=0,ipadx='60',ipady='3',pady='10',padx='20')
     plural = Button(frame1,text="  Add  ",command = lambda: add())
     plural.grid(row=2,column=0,pady=10,ipadx='40')
 
     inp2 = Text(frame1,height=15,width=30)
     inp2.insert('1.0','Type your message')
-    inp2.bind("<FocusIn>",lambda args: inp2.delete('1.0',END))
-    #inp2.bind("<FocusOut>",lambda args: inp2.insert('1.0','Type your message'))
+    inp2.bind("<FocusIn>",lambda args: contentClean(2))
+    inp2.bind("<FocusOut>",lambda args: contentFill(2))
     inp2.grid(row=3,column=0)
 
     TimerButton = Button(frame1,text='Add Timer',command = lambda: showTimer())
-    TimerButton.grid(row=4,column=0,pady=10,ipadx='40',padx=(1,1))
+    TimerButton.grid(row=4,column=0,pady=(10,10),ipadx=60,sticky='nesw',padx=65)
 
     reminderButton = Button(frame1,text='Add Reminder',command = lambda: showReminder())
-    reminderButton.grid(row=5,column=0,pady=10,ipadx='40',padx=(1,1))
+    reminderButton.grid(row=5,column=0,pady=10,ipadx=60,sticky='nesw',padx=65)
 
     fixedButton = Button(frame1,text='Fixed MSG',command = lambda: fixedmsg())
-    fixedButton.grid(row=6,column=0,pady=10,ipadx='40',padx=(1,1))
+    fixedButton.grid(row=6,column=0,pady=10,ipadx=60,sticky='nesw',padx=65)
 
-    seeLog = Button(frame1,text='  Log  ',command=lambda:Display())
-    seeLog.grid(row=7,column=0,pady=10,ipadx='40')
+    seeLog = Button(frame1,text='Log',command=lambda:Display())
+    seeLog.grid(row=7,column=0,pady=10,ipadx=60,sticky='nesw',padx=65)
 
     close = Button(frame1,text='Close',command=lambda:closeF())
-    close.grid(row=8,column=0,pady=10,ipadx='40')
+    close.grid(row=8,column=0,pady=10,ipadx=60,sticky='nesw',padx=65)
 
     sub1 = Button(frame1,text=' Submit ',command=lambda:send())
-    sub1.grid(row=9,column=0,pady=10,ipadx='40')
+    sub1.grid(row=9,column=0,pady=(10,10),ipadx=60,sticky='nesw',padx=65)
 
     menu.mainloop()
 
