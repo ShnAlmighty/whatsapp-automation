@@ -32,14 +32,26 @@ def send():
         size=0
 
     if(size==0):
-        contact =  str(inp1.get()) 
+        contact =  inp1.get()
     else:
         contact=list(recievers)
         recievers = []
 
     text = str(inp2.get("1.0","end-1c"))
-
-    if(timeE != None):
+    nameCheck,textCheck=1,1
+    if(timeE!=None):
+        if(timeE.get()=="" or timeE.get()=="Time at which you want to send(hh:mm:ss)"):
+            timeE = None
+    if(remiderE!=None):
+        if(remiderE.get()=="" or remiderE=="Date at which you want to send(YYYY:MM:DD)"):
+            remiderE=None
+    if(text=="Type your message" or text==""):
+        messagebox.showerror('showerror','Kindly write your message first')
+        textCheck=0
+    if(contact=="Name of person" or contact==""):
+        messagebox.showerror('showerror','Kindly provide the name or names')
+        nameCheck=0
+    if(timeE != None and textCheck==1 and nameCheck==1):
         alarm =  str(timeE.get())  
         if(alarm!=""):
             if(remiderE != None):
@@ -73,8 +85,8 @@ def send():
         TimerButton.grid()
         timeE = None
         FIXED=0
-        fixedButton.config(text="Fix MSG")
-    else: 
+        fixedButton.config(text="Send Daily")
+    elif(timeE==None and textCheck==1 and nameCheck==1 ): 
         timeE1 = datetime.datetime.now().strftime("%Y-%m-%d %X")
         if(size>1):
             for i in range(size):
@@ -88,7 +100,7 @@ def send():
             """%(contact,text,timeE1,FIXED))
             conn.commit()
         FIXED=0
-        fixedButton.config(text="Fix MSG")
+        fixedButton.config(text="Send Daily")
 
 def contentClean(a):
     if a==1:
@@ -127,7 +139,7 @@ def contentFill(a):
            remiderE.insert(0,'Date at which you want to send(YYYY-MM-DD)')
         
 def showTimer():
-    global hl,timeE,TimerButton
+    global timeE,TimerButton
     TimerButton.grid_remove()
     timeE = Entry(frame1,textvariable="")
     timeE.insert(0,'Time at which you want to send(hh:mm:ss)')
@@ -136,7 +148,7 @@ def showTimer():
     timeE.bind("<FocusIn>",lambda args: contentClean(3))
 
 def showReminder():
-    global reminderButton,remiderE,sl
+    global reminderButton,remiderE
     reminderButton.grid_remove()
     remiderE = Entry(frame1,textvariable="")
     remiderE.insert(0,'Date at which you want to send(YYYY:MM:DD)')
@@ -200,21 +212,29 @@ def Display():
     exit.grid(row=(i+1),column=0,pady=10,ipadx='40',padx=(5,5))
 
 def fixedmsg():
-    y= messagebox.askyesno('askyesno','Do you want to fix this message?')
-    if(y==True):
-        global FIXED,fixedButton
-        FIXED = 1
-        fixedButton.config(text="Fixed")
-        messagebox.showinfo('showinfo','Message is fixed. This message will be sent everyday at the given time. Go to log if you want to remove this message.')
+    global FIXED,fixedButton
+    if(FIXED==0):
+        y= messagebox.askyesno('askyesno','Do you want to fix this message?')
+        if(y==True):
+            FIXED = 1
+            fixedButton.config(text="Fixed")
+            messagebox.showinfo('showinfo','Message is fixed. This message will be sent everyday at the given time. Go to log if you want to remove this message.')
+    elif(FIXED==1):
+        y= messagebox.askyesno('askyesno','Do you want to remove this message from being send daily?')
+        if(y==True):
+            FIXED = 0
+            fixedButton.config(text="Send Daily")
+            messagebox.showinfo('showinfo','Message is removed and will not be send daily.')
+
 
 def main():
     connect()
     
-    global logBook,frame1,FIXED,fixedButton
+    global frame1,FIXED,fixedButton
     FIXED=0
-    logBook = subprocess.Popen(["runLog.py"],shell=True)
+    #logBook = subprocess.Popen(["runLog.py"],shell=True)
 
-    global menu,ans,inp1,inp2,timeE,TimerButton,frame1,plural,reminderButton,remiderE
+    global menu,inp1,inp2,timeE,TimerButton,frame1,plural,reminderButton,remiderE
     menu = Tk()
     frame1 = Frame(menu)
     frame1.grid()
@@ -248,7 +268,7 @@ def main():
     reminderButton = Button(frame1,text='Add Reminder',command = lambda: showReminder())
     reminderButton.grid(row=5,column=0,pady=10,ipadx=60,sticky='nesw',padx=65)
 
-    fixedButton = Button(frame1,text='Fixed MSG',command = lambda: fixedmsg())
+    fixedButton = Button(frame1,text='Send Daily',command = lambda: fixedmsg())
     fixedButton.grid(row=6,column=0,pady=10,ipadx=60,sticky='nesw',padx=65)
 
     seeLog = Button(frame1,text='Log',command=lambda:Display())
